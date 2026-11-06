@@ -1,6 +1,6 @@
 # MVFBarcode
 
-A C++20 tool and header-only library implementing the matrix-update algorithm for Conley–Morse persistence barcodes. It accepts zigzags of multivector fields or block partitions and returns interval endpoints on the supplied fields.
+A C++20 tool and header-only library implementing the matrix-update algorithm for Conley–Morse persistence barcodes. It accepts zigzags of multivector fields or block partitions and returns interval endpoints on the supplied fields, expressing the Conley-morse persistence barcode.
 
 ## Input, output and usage
 
@@ -22,7 +22,7 @@ Before `# multivectors`, records give a simplex ID and its vertex labels. IDs ru
 
 All files must describe the same complex with the same simplex IDs. Multivectors must be locally closed: if they contain two comparable simplices, they contain every simplex between them in the face order. Consecutive fields must be refinement-comparable, meaning that every multivector of one field is contained in a multivector of the other. Identical fields are allowed. Invalid inputs are rejected.
 
-An optional order file lists every simplex ID exactly once, separated by whitespace. Faces must precede cofaces, and each initial coalesced block must be consecutive.
+An optional order file lists every simplex ID exactly once, separated by whitespace. Faces must precede cofaces, and each initial coalesced block must be consecutive. This order will be used when creating a a block-boundary matrix for the initial complex and multivector field.
 
 ### Output format
 
@@ -32,7 +32,7 @@ Standard output contains one JSON object. The bundled edge example produces:
 {"schema":"mvf_barcodes_v1","barcodes":[{"dimension":0,"birth":0,"death":null},{"dimension":0,"birth":1,"death":2},{"dimension":1,"birth":1,"death":2}]}
 ```
 
-Indices refer to the original supplied fields, starting at zero. A finite interval is present when `birth <= i < death`; `null` means it survives at the final field. Repeated entries give multiplicity. Unchanged coalesced partitions retain their input indices. Results are sorted by dimension, birth and death. Success returns zero; errors go to standard error and return one.
+Indices refer to the original supplied fields, starting at zero. A finite interval is present when `birth <= i < death`; `null` means it survives at the final field. Repeated entries give multiplicity. Unchanged coalesced partitions retain their input indices. Results are sorted by dimension, birth and death.
 
 In the edge example, the first field puts the whole edge complex in one block, the second separates the edge from the block containing its two vertices, and the third rejoins them. One degree-zero interval persists throughout; an additional degree-zero interval and a degree-one interval have support `[1,2)`. The latter records the homology of the edge relative to its endpoints.
 
