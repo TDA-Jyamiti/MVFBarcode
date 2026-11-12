@@ -97,31 +97,6 @@ The benchmark folders retain the initial orders used in the paper. For example:
 
 Omit `--order` to use the default rule described below. The long simplexwise inputs are omitted: on any of these complexes, start with all `n` simplices in one block, split off IDs `n-1, n-2, ..., 1`, then undo the splits in reverse order. This gives `2n-1` supplied fields. The paper uses the initial order `0, 1, ..., n-1`, which is dimension-ordered in these data.
 
-## Algorithm
-
-After checking the input conditions above, the program coalesces the fields, initializes a matrix decomposition, and updates it along the zigzag. The output retains interval endpoints at the supplied fields.
-
-### Coalescing multivectors
-
-An arrow between multivectors records a simplex in the first having a codimension-one face in the second. Merging each strongly connected component of this graph gives the finest block partition. Refinement is preserved, so the resulting block partitions form a zigzag in the same directions.
-
-![Splitting a multivector on a triangle boundary changes one coalesced block into three.](figures/multivector_split.png)
-
-The figure shows an unfilled triangle, with colors identifying multivectors. In (a), `A = {a, ab}` and `B = {b, c, bc, ca}` form a directed cycle: `ab -> b` gives `A -> B`, and `ca -> a` gives `B -> A`. They therefore coalesce into one block.
-
-In (b), split `A` into `C = {a}` and `D = {ab}`, leaving `B` unchanged. The graph is now acyclic, so there are three blocks. Thus one multivector split can require several binary block splits.
-
-### Initial order and reduction
-
-Unless an initial order is supplied, coalesced blocks follow a topological order with faces before cofaces. Whenever several blocks are available, the block containing the smallest simplex ID is chosen. Within each block, simplices are ordered by dimension, then ID.
-
-The program stores the boundary matrix `D` and its decomposition `R = D U` in packed 64-bit columns. Starting from `R = D` and `U = I`, it performs an initial block reduction. Column additions are XOR operations, applied to corresponding columns of `R` and `U` together.
-
-### Updates and interval tracking
-
-Larger refinements and coarsenings are factored into binary block splits or merges, which are then expanded into elementary matrix updates. These operations maintain a block-reduced `R` and a uniform `U`. Subsequent updates use the current matrix order: contiguous cuts and joins preserve it; general splits or nonadjacent merges may require reordering.
-
-The update rules track the births and deaths of features carried by non-homogeneous, non-targeted columns. All updates within one supplied transition use its destination field index. Intervals created and destroyed entirely within that transition have equal endpoints and are discarded, leaving the barcode restricted to the supplied fields.
 
 ## Source and citation
 
